@@ -1,7 +1,11 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    {% if watchlist == True %}
+        <h2>Watchlist Listing</h2>
+    {% else %}
+        <h2>Active Listings</h2>
+    {% endif %}
 
     {% for listing in listings %}
         <li>
@@ -10,7 +14,7 @@
                 {{ listing.description }}
             </div>
             <div>
-                {{ listing.price }}
+                {{ listing.price.value }}
             </div>
             <img src="{{ listing.image }}" alt="">
             
