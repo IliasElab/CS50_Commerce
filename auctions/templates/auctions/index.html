@@ -1,11 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    {% if watchlist == True %}
-        <h2>Watchlist Listing</h2>
-    {% else %}
-        <h2>Active Listings</h2>
-    {% endif %}
+    <h2>{{title}}</h2>
 
     {% for listing in listings %}
         <li>
@@ -13,11 +9,16 @@
             <div>
                 {{ listing.description }}
             </div>
-            <div>
-                {{ listing.price.value }}
-            </div>
+
             <img src="{{ listing.image }}" alt="">
             
+            <div>
+                {% if not listing.bids.all %}
+                    <p>Prix : {{ listing.baseprice }} $</p>    
+                {% else %}
+                    <p>Prix : {{ listing.bids.first.value }} $</p> 
+                {% endif %}
+            </div>
             
         </li>
     {% endfor %}

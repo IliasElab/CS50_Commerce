@@ -13,16 +13,23 @@ from .models import *
 def index(request):
     return render(request, "auctions/index.html", {
         "listings": Auction.objects.filter(isactive = True),
-        "watchlist": False
+        "title": "Active Listing"
     })
 
 def watchlist(request):
     wlist = request.user.watchlist.all()
     return render(request, "auctions/index.html", {
         "listings": Auction.objects.filter(id__in = [wl.id for wl in wlist]),
-        "watchlist": True
+        "title": "Watchlist"
     })
 
+def mybids(request):
+    blist = request.user.proposer_bids.all()
+    alist = Auction.objects.all()
+    return render(request, "auctions/index.html", {
+        "listings": alist.filter(id__in = [bl.auction.id for bl in blist]),
+        "title": "My Bids"
+    })
 
 def login_view(request):
     if request.method == "POST":
@@ -78,16 +85,14 @@ def register(request):
 @login_required()
 def addlisting(request):
     if request.method == "POST":
-        initialbid = Bid(value = request.POST["baseprice"], proposer = request.user)
         new = Auction(
             title=request.POST["title"], 
             category = request.POST["category"], 
             description= request.POST["description"], 
-            price=initialbid,
+            baseprice=request.POST["baseprice"],
             image=request.POST["URL"],
             createdby=request.user)
 
-        initialbid.save()
         new.save()
         return render(request, "auctions/index.html", {
             "listings": Auction.objects.filter(isactive = True)
@@ -99,28 +104,34 @@ def addlisting(request):
 def listing(request, listing_id):
     auction = Auction.objects.get(id = listing_id)
     watchlist = None
-
-    if request.method == "POST" and request.user.is_authenticated:
-        if "Adding" in request.POST:
-            request.user.watchlist.add(auction)
-        elif "Removing" in request.POST:
-            request.user.watchlist.remove(auction)
-        elif "bid" in request.POST and float(request.POST["bid"]) > Auction.objects.get(id = listing_id).price.value:
-            new = Bid(value = float(request.POST["bid"]), proposer = request.user)
-            new.save()
-            auction.price = new
-            auction.save()
-        elif "Closing" in request.POST:
-            #return HttpResponse(auction.price)
-            auction.isactive = False
-            auction.save()
-        else:
-            return HttpResponse("Done erroring")
+    message = ''
 
     if request.user.is_authenticated:
         watchlist = request.user.watchlist.all()
 
+        if auction.isactive == False and auction.bids.first() and auction.bids.first().proposer == request.user:
+            message = "You won this auction !"
+
+        if request.method == "POST":
+            #return HttpResponse(request.POST)
+            if "Adding" in request.POST:
+                request.user.watchlist.add(auction)
+            elif "Removing" in request.POST:
+                request.user.watchlist.remove(auction)
+            elif "Bid" in request.POST and ((not auction.bids.all() and float(request.POST["Bid"]) > auction.baseprice) or (auction.bids.first() and auction.bids.first().value < float(request.POST["Bid"]))):
+                new = Bid(value = float(request.POST["Bid"]), proposer = request.user, auction = auction)
+                new.save()   
+            elif "Closing" in request.POST:
+                auction.isactive = False
+                auction.save()
+            elif "Commenting" in request.POST:
+                comment = Comment(auction = auction, writer = request.user, content = request.POST["Commenting"])
+                comment.save()
+            else:
+                message = "An error has been detected"
+
     return render(request, "auctions/listing.html", {
         "listing" : auction,
-        "watchlist" : watchlist
+        "watchlist" : watchlist,
+        "message": message
     })
