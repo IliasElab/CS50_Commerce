@@ -6,7 +6,6 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
 from .models import *
-#from django.forms import NameForm
 
 
 
@@ -16,20 +15,32 @@ def index(request):
         "title": "Active Listing"
     })
 
-def watchlist(request):
-    wlist = request.user.watchlist.all()
+def listings(request, type):
+    if type == "watchlist":
+        wlist = request.user.watchlist.all()
+        listings = Auction.objects.filter(id__in = [wl.id for wl in wlist])
+        title = "Watchlist"
+    elif type == "mybids":
+        blist = request.user.proposer_bids.all()
+        listings = Auction.objects.filter(id__in = [bl.auction.id for bl in blist])
+        title = "My Bids"
+    elif type.isdigit() and int(type) in Category.objects.all().values_list('id', flat=True):
+        cat = Category.objects.get(id = int(type))
+        listings = Auction.objects.filter(category = cat)
+        title = "Listing by " + cat.title
+    else:
+        return HttpResponseRedirect(reverse("index"))
+
     return render(request, "auctions/index.html", {
-        "listings": Auction.objects.filter(id__in = [wl.id for wl in wlist]),
-        "title": "Watchlist"
+        "listings": listings,
+        "title": title
     })
 
-def mybids(request):
-    blist = request.user.proposer_bids.all()
-    alist = Auction.objects.all()
-    return render(request, "auctions/index.html", {
-        "listings": alist.filter(id__in = [bl.auction.id for bl in blist]),
-        "title": "My Bids"
+def viewcategory(request):
+    return render(request, "auctions/categorys.html", {
+        "categorys": Category.objects.all()
     })
+
 
 def login_view(request):
     if request.method == "POST":
@@ -87,18 +98,31 @@ def addlisting(request):
     if request.method == "POST":
         new = Auction(
             title=request.POST["title"], 
-            category = request.POST["category"], 
+            category = Category.objects.get(id = int(request.POST["category"])), 
             description= request.POST["description"], 
             baseprice=request.POST["baseprice"],
             image=request.POST["URL"],
             createdby=request.user)
 
         new.save()
-        return render(request, "auctions/index.html", {
-            "listings": Auction.objects.filter(isactive = True)
-        })
+        return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "auctions/new_listing.html")
+        return render(request, "auctions/new_listing.html", {
+            "categorys": Category.objects.all()
+        })
+
+
+@login_required()
+def addcategory(request):
+    if request.method == "POST":
+        new = Category(
+            title=request.POST["title"], 
+            description= request.POST["description"])
+
+        new.save()
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        return render(request, "auctions/new_category.html")
 
  
 def listing(request, listing_id):

@@ -4,7 +4,7 @@
 
     <h2>{{ listing.title }}</h2>
     <img src="{{ listing.image }}" alt=""> 
-    <p>Catégorie : {{ listing.category }}</p>
+    <p>Catégorie : {{ listing.category.title }}</p>
     <p>Description : {{ listing.description }}</p>
     
 
@@ -58,10 +58,15 @@
                 </form>
             {% endif %}
         <br>
+
         <h4>Comments : </h4>
         {% for comment in listing.comments.all %}
-            <p>{{comment.writer}} : {{comment.content}}</p>
+            <p>{{comment.writer}} on {{comment.date}} : {{comment.content}}</p>
+        {% empty %}
+            <p>No Comments yet</p>
         {% endfor %}
+
+        <h3>Add a Comment</h3>
         <form action="{% url 'listing' listing.id %}" method="POST">
             {% csrf_token %}
             <textarea rows="4" cols="50" name="Commenting"></textarea>

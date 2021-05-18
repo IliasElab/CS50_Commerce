@@ -25,18 +25,25 @@ def linkify(field_name):
     return _linkify
 
 class AuctionAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "description", "baseprice", "category", "createdby", "isactive")
+    list_display = ("id", "title", "description", "baseprice", linkify(field_name="category"), "createdby", "isactive")
     
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'username', 'email', 'password', 'is_staff', 'is_active')
+    list_display = ('id', 'username', 'email')
     filter_horizontal = ("watchlist",)
 
 class BidAdmin(admin.ModelAdmin):
     list_display = ("id", "proposer", "value", linkify(field_name="auction"))
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ("id", "writer", "content", linkify(field_name="auction"), "date")
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("id", "title", "description")
+
 admin.site.register(Auction, AuctionAdmin)
 admin.site.register(Bid, BidAdmin)
-admin.site.register(Comment)
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(User, UserAdmin)
+admin.site.register(Category, CategoryAdmin)
 

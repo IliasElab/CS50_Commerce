@@ -9,7 +9,11 @@
             <input autofocus class="form-control" type="text" name="title" placeholder="Title">
         </div>
         <div class="form-group">
-            <input autofocus class="form-control" type="text" name="category" placeholder="Category">
+            <select name="category">
+                {% for category in categorys %}
+                    <option value="{{ category.id }}">Category N°{{ category.id }} : {{ category.title }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="form-group">
             <input autofocus class="form-control" type="text" name="description" placeholder="Description">
