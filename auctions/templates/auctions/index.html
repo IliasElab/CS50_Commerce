@@ -14,9 +14,9 @@
             
             <div>
                 {% if not listing.bids.all %}
-                    <p>Prix : {{ listing.baseprice }} $</p>    
+                    <p>Price : {{ listing.baseprice }} $</p>    
                 {% else %}
-                    <p>Prix : {{ listing.bids.first.value }} $</p> 
+                    <p>Price : {{ listing.bids.first.value }} $</p> 
                 {% endif %}
             </div>
             
