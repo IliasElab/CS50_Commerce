@@ -6,7 +6,7 @@
         .next{
             position:relative;
             left: 15px;
-            /*bottom: 180px;*/
+            top: 4px;
         }
         .containers {
             display: flex;
@@ -16,13 +16,19 @@
     <div class="containers">
         <h2>{{ listing.title }}</h2>
         {% if user.is_authenticated %}
-        <form style="top: 4px;" class="next" id="watchlist" action="{% url 'listing' listing.id %}" method="POST">
+        <form class="next" id="watchlist" action="{% url 'listing' listing.id %}" method="POST">
             {% csrf_token %}
             {% if listing in watchlist %}
                     <input type="submit" name="Removing" value="Remove from WatchList"/>
                 </form>
             {% else %}
                     <input type="submit" name="Adding" value="Add to WatchList"/>
+                </form>
+            {% endif %}
+            {% if listing.createdby == request.user and listing.isactive == True %}
+                <form style="left: 30px;" class="next" action="{% url 'listing' listing.id %}" method="POST">
+                {% csrf_token %}
+                    <input style="background-color: red;" type="submit" name="Closing" value="Close the auction" />
                 </form>
             {% endif %}
         {% endif %}
@@ -32,7 +38,7 @@
         {% if listing.image %}
             <img style="width: 240px; height: 180px;" src="{{ listing.image }}" alt=""> 
         {% else %}
-            <img style="width: 160px; height: 180px;" src="{% static 'images/noimages.jpg' %}" alt=""> 
+            <img style="width: 160px; height: 180px;" src="{% static 'auctions/images/noimages.jpg' %}" alt=""> 
         {% endif %}
         <div class="next">
             <p>Category : {{ listing.category.title }}</p>
@@ -74,13 +80,6 @@
 
     
     {% if user.is_authenticated %}
-        {% if listing.createdby == request.user and listing.isactive == True %}
-            <form action="{% url 'listing' listing.id %}" method="POST">
-            {% csrf_token %}
-                <input type="submit" name="Closing" value="Close the auction" />
-            </form>
-        {% else %}
-        {% endif %}
         <br>
         <h3>Add a Comment</h3>
         <form action="{% url 'listing' listing.id %}" method="POST">
@@ -89,8 +88,6 @@
             <br>
             <input type="submit" value="Add a New Comment"/>
         </form>
-    {% else %}
-
     {% endif %}
     <br>
     <h4>Comments : </h4>
