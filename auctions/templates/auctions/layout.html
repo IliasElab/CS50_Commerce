@@ -5,63 +5,75 @@
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Auctions{% endblock %}</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+        <!--<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous"> -->
         <link href="{% static 'auctions/css/styles.css' %}" rel="stylesheet">
 
         <link rel="shortcut icon" href="{% static 'auctions/favicon.ico' %}"/>
 
     </head>
     <body>
-        <h1>Auctions</h1>
-        <div>
-            {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
-            {% else %}
-                Not signed in.
-            {% endif %}
-        </div>
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'viewcategory' %}">Categories</a>
-            </li>
-            {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'addlisting' %}">New Listing</a>
-                </li>
-                {% if user.is_staff == True %}    
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'addcategory' %}">New Category</a>
-                    </li>
-                {% endif %}
-                <li style="display: flex" class="nav-item">
-                    <a style="padding-right: 5px;" class="nav-link" href="{% url 'listings' type='watchlist' %}">Watchlist</a>
-                    <span style="float: left;">
-                        {% if user.watchlist.count > 0 %}
-                            {{ user.watchlist.count }}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{% url 'index' %}">Active Listings</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'viewcategory' %}">Categories</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'addlisting' %}">New Listing</a>
+                            </li>
+                            {% if user.is_staff == True %}    
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'addcategory' %}">New Category</a>
+                                </li>
+                            {% endif %}
+                            <li style="display: flex" class="nav-item">
+                                <a style="padding-right: 5px;" class="nav-link" href="{% url 'listings' type='watchlist' %}">Watchlist</a>
+                                <span style="float: left; color: lavender;">
+                                    {% if user.watchlist.count > 0 %}
+                                        {{ user.watchlist.count }}
+                                    {% endif %}
+                                </span>      
+                            </li> 
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'listings' type='mybids' %}">My Bids</a>
+                            </li>
                         {% endif %}
-                    </span>      
-                </li> 
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'listings' type='mybids' %}">My Bids</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                </li>  
-                
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
-                </li>
-            {% endif %}
-        </ul>
-        <hr>
+                    </ul>
+
+                    {% if user.is_authenticated %}
+                        <ul class="navbar-nav ms-auto">
+                            <span class="navbar-brand mb-0 h3">Signed in as {{ user.username }}</span>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                            </li>  
+                        </ul>
+                    {% else %}
+                        <ul class="navbar-nav ms-auto">
+                            <span class="navbar-brand mb-0 h1">Not signed in.</span>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'register' %}">Register</a>
+                            </li>
+                        </ul>
+                    {% endif %}
+
+                </div>
+            </div>
+        </nav>
+
         {% block body %}
         {% endblock %}
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+
     </body>
 </html>

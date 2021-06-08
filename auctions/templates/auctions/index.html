@@ -1,25 +1,35 @@
 {% extends "auctions/layout.html" %}
-
+{% load static %}
 {% block body %}
     <h2>{{title}}</h2>
-
-    {% for listing in listings %}
-        <li>
-            <a href="{% url 'listing' listing.id %}">{{ listing.title }}</a>
-            <div>
-                {{ listing.description }}
+    
+<div class="container">
+    <div class="row row-cols-3"> 
+        {% for listing in listings %}
+            <div class="col">
+                <div class="card" style="width: 18rem;">
+                    <div class="card-header">{{ listing.category.title }}</div>
+                    {% if listing.image %}
+                        <img style="width: 280px; height: 220px;" src="{{ listing.image }}" class="card-img-top" alt="...">
+                    {% else %}
+                        <img style="width: 250px; height: 220px;" src="{% static 'auctions/images/noimages.jpg' %}" alt=""> 
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ listing.title }}</h5>
+                        <p class="card-text">{{ listing.description }}</p>
+                        {% if not listing.bids.all %}
+                            <p>Price : {{ listing.baseprice }} $</p>    
+                        {% else %}
+                            <p>Price : {{ listing.bids.first.value }} $</p> 
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <a href="{% url 'listing' listing.id %}">More Details</a>
+                    </div>
+                </div>
             </div>
+        {% endfor %}
+    </div>
+</div>
 
-            <img src="{{ listing.image }}" alt="">
-            
-            <div>
-                {% if not listing.bids.all %}
-                    <p>Price : {{ listing.baseprice }} $</p>    
-                {% else %}
-                    <p>Price : {{ listing.bids.first.value }} $</p> 
-                {% endif %}
-            </div>
-            
-        </li>
-    {% endfor %}
 {% endblock %}

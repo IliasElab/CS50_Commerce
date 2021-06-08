@@ -36,9 +36,9 @@
     
     <div class="containers">
         {% if listing.image %}
-            <img style="width: 240px; height: 180px;" src="{{ listing.image }}" alt=""> 
+            <img style="width: 280px; height: 220px;" src="{{ listing.image }}" alt=""> 
         {% else %}
-            <img style="width: 160px; height: 180px;" src="{% static 'auctions/images/noimages.jpg' %}" alt=""> 
+            <img style="width: 250px; height: 220px;" src="{% static 'auctions/images/noimages.jpg' %}" alt=""> 
         {% endif %}
         <div class="next">
             <p>Category : {{ listing.category.title }}</p>
@@ -61,7 +61,7 @@
 
     {% if listing.isactive == True %}
         {% if user.is_authenticated %}
-            <form action="{% url 'listing' listing.id %}" method="POST">
+            <form style="margin-top:10px;" action="{% url 'listing' listing.id %}" method="POST">
                 {% csrf_token %}
                 <div class="form-group">
                     {% if not listing.bids.all %}
@@ -88,6 +88,8 @@
             <br>
             <input type="submit" value="Add a New Comment"/>
         </form>
+
+
     {% endif %}
     <br>
     <h4>Comments : </h4>
